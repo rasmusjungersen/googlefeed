@@ -1,0 +1,70 @@
+<{strip}>
+<{assign var="products" value=$landing_page->getProducts()}>
+<rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">
+<channel>
+    <title><{$landing_page->getName()|escape}></title>
+    <link><{$landing_page->getURL()|escape}></link>
+    <description/>
+    <{section name="i" loop=$products}>
+    <item>
+        <title><{$products[i]->getName()|escape}> <{if $products[i]->getMetaValue("googletitle")}><{$products[i]->getMetaValue("googletitle")}><{/if}></title>
+        <link><{$products[i]->getRemoteURL()|escape}></link>
+        <description><{if $products[i]->getDescription()|escape}><{$products[i]->getDescription()|strip_tags:'UTF-8'|replace:'&oslash;':'ø'|replace:'&aring;':'å'|replace:'&aelig;':'æ'|replace:'&Oslash;':'Ø'|replace:'&Aring;':'Å'|replace:'&AElig;':'Æ'|replace:'&amp;nbsp;':''|replace:'&amp;':'og'|replace:'&#039;':''|replace:'&nbsp;':' '|replace:'&trade;':''|replace:'&reg;':''|escape}><{elseif $products[i]->getListDescription()|escape}><{$products[i]->getListDescription()|escape}><{else}><{$products[i]->getName()|escape}><{/if}></description>
+        <g:id><{$products[i]->getProductId()|escape}></g:id>
+        <g:price><{$products[i]->getPrice()|number_format:2:",":"."}> <{$webshop->getCurrency()}> </g:price>
+        <{if $products[i]->getSalePrice()}><g:sale_price><{$products[i]->getSalePrice()|number_format:2:",":"."}> <{$webshop->getCurrency()}> </g:sale_price><{else}><g:sale_price/><{/if}>
+        <g:availability><{if $products[i]->getIsInStock()|escape}>in stock<{else}>out of stock<{/if}></g:availability>
+        <{assign var="images" value=$products[i]->getImages()}><{if $images}><g:image_link><{$webshop->getURL()}><{$images[0]->getSrc(1000, 1000, 'fit')}></g:image_link>
+        <{if $images[1]}><g:additional_image_link><{$webshop->getURL()}><{$images[1]->getSrc(1000, 1000, 'fit')}></g:additional_image_link><{/if}><{/if}>
+        <g:condition>new</g:condition>
+        <{if $products[i]->getMetaValue("g:color")}>
+            <g:color><{$products[i]->getMetaValue("g:color")}></g:color>
+        <{else}>
+            <{assign var="profile" value=$products[i]->getProfile()}>
+            <{assign var="attr" value=$profile->getAttributeList()}>
+            <{if $attr}>
+                <{section name="j" loop=$attr}>
+                    <{if !$attr[j]->getIsVariant()}>
+                        <{if $attr[j]->getName() eq 'Farve'}>
+                            <g:color><{$products[i]->getAttributeValue($attr[j]->getAttributeId())}></g:color>
+                        <{/if}>
+                    <{/if}>
+                <{/section}>
+            <{/if}>
+        <{/if}>
+        <{if $products[i]->getGtin()}><g:gtin><{$products[i]->getGtin()}></g:gtin><{/if}>
+        <{if $products[i]->getMetaValue("g:age_group")}><g:age_group><{$products[i]->getMetaValue("g:age_group")}></g:age_group><{elseif $settings.google_feed.age_group}><g:age_group><{$settings.google_feed.age_group}></g:age_group><{/if}>
+        <{if $products[i]->getMetaValue("g:material")}><g:material><{$products[i]->getMetaValue("g:material")}></g:material><{/if}>
+        <{if $products[i]->getMetaValue("g:size_system")}><g:size_system><{$products[i]->getMetaValue("g:size_system")}></g:size_system><{elseif $settings.google_feed.size_system}><g:size_system><{$settings.google_feed.size_system}></g:size_system><{/if}>
+        <{if $products[i]->getMetaValue("g:pattern")}><g:pattern><{$products[i]->getMetaValue("g:pattern")}></g:pattern><{/if}>
+        <g:google_product_category><{if $products[i]->getMetaValue("g:google")}><{$products[i]->getMetaValue("g:google")}><{else}><{assign var="categories" value=$products[i]->getCategories()}><{counter assign=z start=0 print=false}><{section name="b" loop="$categories" step=-1}><{if $z == 0}><{$categories[b]->getName()|escape}><{else}> > <{$categories[b]->getName()|escape}><{/if}><{counter}><{/section}><{/if}></g:google_product_category>
+        <{if $products[i]->getSupplier()}><{assign var="supplier" value=$products[i]->getSupplier()}><g:brand><{$supplier->getName()|escape}></g:brand><{else}><g:brand/><{/if}>
+        <g:mpn><{$products[i]->getOwnId()|escape}></g:mpn>
+        <{if $settings.google_feed.shipping_price}>
+        <g:shipping>
+            <g:country>DK</g:country>
+            <g:service>Standard</g:service>
+            <g:price><{$settings.google_feed.shipping_price}> <{$webshop->getCurrency()}></g:price>
+        </g:shipping>
+        <{/if}>
+            <{assign var="categories" value=$products[i]->getCategories()}>
+            <{assign var="mainCat" value=$products[i]->getMainCategory()}>
+            <g:product_type>
+            <{if $mainCat}>
+                <{$mainCat->getName()|escape}>
+            <{else}>
+                <{counter assign=z start=0 print=false}>
+                <{section name="b" loop="$categories" step=-1}>
+                    <{if $z == 0}>
+                        <{$categories[b]->getName()|escape}><{else}> > <{$categories[b]->getName()|escape}>
+                    <{/if}>
+                    <{counter}>
+                <{/section}>
+            <{/if}>
+            </g:product_type>
+            <{if $products[i]->getSalePrice()}><g:custom_label_0>Tilbud</g:custom_label_0><{/if}>
+    </item>
+    <{/section}>
+</channel>
+</rss>
+<{/strip}>
