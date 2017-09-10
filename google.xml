@@ -7,7 +7,7 @@
     <description/>
     <{section name="i" loop=$products}>
     <item>
-        <title><{$products[i]->getName()|escape}> <{if $products[i]->getMetaValue("googletitle")}><{$products[i]->getMetaValue("googletitle")}><{/if}></title>
+        <title><{if $products[i]->getMetaValue("googletitle")}><{$products[i]->getMetaValue("googletitle")}><{elseif $products[i]->getMetaValue("g:title")}><{$products[i]->getMetaValue("g:title")}><{else}><{$products[i]->getName()|escape}><{/if}></title>
         <link><{$products[i]->getRemoteURL()|escape}></link>
         <description><{if $products[i]->getDescription()|escape}><{$products[i]->getDescription()|strip_tags:'UTF-8'|replace:'&oslash;':'ø'|replace:'&aring;':'å'|replace:'&aelig;':'æ'|replace:'&Oslash;':'Ø'|replace:'&Aring;':'Å'|replace:'&AElig;':'Æ'|replace:'&amp;nbsp;':''|replace:'&amp;':'og'|replace:'&#039;':''|replace:'&nbsp;':' '|replace:'&trade;':''|replace:'&reg;':''|escape}><{elseif $products[i]->getListDescription()|escape}><{$products[i]->getListDescription()|escape}><{else}><{$products[i]->getName()|escape}><{/if}></description>
         <g:id><{$products[i]->getProductId()|escape}></g:id>
